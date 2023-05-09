@@ -79,5 +79,6 @@ router.post("/categories/update", (req, res) =>{
     }).then(() =>{
         res.redirect("/admin/categories");
     })
-})
+});
+
 module.exports = router;
