@@ -3,6 +3,7 @@ const router = express.Router();
 const Category = require("../categories/Category");
 const Article = require("./Article");
 const slugify = require("slugify");
+const { ARRAY } = require("sequelize");
 
 router.get("/admin/articles", (req, res) => {
     Article.findAll({
@@ -50,6 +51,40 @@ router.post("/articles/delete", (req, res) => {
     }else{
         res.redirect("/admin/articles");
     }
+});
+
+router.get("/admin/articles/edit/:id", (req, res) => {
+    var id = req.params.id;
+    console.log(id);
+    Article.findByPk(id).then(article =>{
+        if(article != undefined){
+            Category.findAll().then(categories => {
+                res.render("admin/articles/edit", {categories: categories, article: article})
+            });
+        }else{
+            res.redirect("/");
+        }
+    }).catch(err => {
+        res.redirect("/");
+    });
+
+});
+
+router.post("/articles/update", (req, res) => {
+    var id = req.body.id;
+    var title = req.body.title;
+    var body = req.body.body;
+    var category = req.body.category;
+
+    Article.update({title: title, body: body, categoryId: category, slug: slugify(title)}, {
+        where: {
+            id: id
+        }
+    }).then(() => {
+        res.redirect("/admin/articles");
+    }).catch(err => {
+        res.redirect("/");
+    });
 });
 
 module.exports = router;
