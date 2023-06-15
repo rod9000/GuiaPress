@@ -32,13 +32,26 @@ app.use("/", categoriesController);
 app.use("/", articlesController);
 
 app.get("/", (req, res) => {
-    Article.findAll({
+    Article.findAndCountAll({
         order:[
             ['id', 'DESC']
-        ]
+        ],
+        limit: 4
     }).then(articles => {
+
+        if(articles.count > 4){
+            next = true;
+        }else{
+            next = false; 
+        }
+
+        var result = {
+            next : next, 
+            articles : articles
+        }
+
         Category.findAll().then(categories => {
-            res.render("index", {articles: articles, categories: categories});
+            res.render("index", {result: result, categories: categories});
         });
     });
 });
